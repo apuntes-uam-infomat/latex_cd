@@ -16,7 +16,7 @@ function prebuild() {
 }
 
 function build() {
-	latexmk -pdf -silent -shell-escape $1
+	latexmk -pdf -silent -shell-escape "$1"
 }
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
@@ -51,7 +51,8 @@ IFS=$'\n'
 for texfile in $(ls $repo_dir/*/*.tex); do
 	cwd=$(pwd)
 	cd "$(dirname $texfile)"
-
+	
+	echo "Checking $texfile..."
 	texfile="$(basename $texfile)"
 
 	if [ "$packages_changed" = true ]; then 
