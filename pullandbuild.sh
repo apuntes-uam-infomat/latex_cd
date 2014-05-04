@@ -64,7 +64,7 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 		echo "$texfile out of date. Compiling..."
 		if build "$texfile" ; then
 			echo "Uploading $texfile..."
-			$ruby_bin "$cwd/dbupload.rb" "$db_token" "$texfile"
+			$ruby_bin "$cwd/dbupload.rb" "$db_token" "${texfile/.tex/.pdf}"
 		else
 			echo "Compilation failed for $texfile"
 			failed="$failed $texfile"
@@ -72,6 +72,7 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 	fi
 
 	cd "$cwd"
+	echo
 done
 
 [[ -z "$failed" ]] || echo "Compilation failed for $failed "
