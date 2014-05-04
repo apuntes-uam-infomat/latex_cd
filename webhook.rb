@@ -5,7 +5,7 @@ set :bind, '0.0.0.0'
 
 post '/payload' do
   puts "Payload received"
-  system './pullandbuild &> pullandbuild.log &'
+  system './pullandbuild.sh &> pullandbuild.log &'
 end
 
 get '/' do
