@@ -44,6 +44,8 @@ fi
 
 cd ..
 
+db_token=$(cat dbtoken)
+
 IFS=$'\n'
 
 for texfile in $(ls $repo_dir/*/*.tex); do
@@ -58,11 +60,11 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 
 	prebuild
 
-	if ! latexmk -pdf -r uptodatecheck.latexmkrc "$texfile" &>/dev/null ; then
+	if ! latexmk -pdf -r "$cwd/uptodatecheck.latexmkrc" "$texfile" &>/dev/null ; then
 		echo "$texfile out of date. Compiling..."
 		if build "$texfile" ; then
 			echo "Uploading $texfile..."
-			$ruby_bin dbupload "$texfile"
+			$ruby_bin "$cwd/dbupload.rb" "$db_token" "$texfile"
 		else
 			echo "Compilation failed for $texfile"
 			failed="$failed $texfile"

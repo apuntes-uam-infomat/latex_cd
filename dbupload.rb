@@ -1,14 +1,12 @@
 require 'dropbox_sdk'
 
-flines = File.readlines("dbtoken")
-
-access_token = flines[0]
+access_token = ARGV[0]
 target_dirs = [ "/Doble Grado UAM/Apuntes LaTeX/", "/Archivo/Apuntes/" ]
-file = ARGV[0]
+file = ARGV[1]
 
 def db_upload(client, dir, file, name)
 	begin
-		puts 'Uploading %s...' % name
+		puts 'Uploading %s to %s...' % [ name, dir ]
 		response = client.put_file(dir + name, open(file), true)
 	rescue => e
 		puts 'Error uploading %s to %s directory' % [ name, dir]
@@ -22,7 +20,7 @@ puts 'DbUpload start'
 client = DropboxClient.new(access_token)
 
 target_dirs.each do |dir|
-	dp_upload(client, dir, file, filename)
+	db_upload(client, dir, file, File.basename(file))
 end
 
 puts 'DbUpload end'
