@@ -3,7 +3,7 @@
 [ -z "$1" ] && echo "need repository remote path" && exit 1
 gems="sinatra json dropbox-sdk"
 
-git clone $1 repo || echo "Error cloning repository. Bailing out" && exit 1
+git clone $1 repo || (echo "Error cloning repository. Bailing out" && exit 1)
 
 echo "Checking ruby installation..."
 
