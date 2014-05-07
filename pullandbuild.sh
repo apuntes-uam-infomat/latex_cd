@@ -8,7 +8,7 @@ failed=""
 
 function packages_install() {
 	cd "$packages_dir"
-	sudo ./install
+	./install
 }
 
 function prebuild() {
