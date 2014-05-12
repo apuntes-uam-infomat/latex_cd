@@ -29,6 +29,7 @@ if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
 	git stash save "auto stash $(date)"
 fi
 
+echo "Push to remote repo at $(date)"
 echo "Pulling repository"
 git pull
 
@@ -77,4 +78,4 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 done
 
 [[ -z "$failed" ]] || echo "Compilation failed for $failed "
-echo "done"
+echo "done: $(date)"
