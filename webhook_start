@@ -1,3 +1,3 @@
 #!/bin/bash
-nohup ruby webhook.rb > webhook.log &
+nohup ruby webhook.rb > /var/log/webhook.log &
 echo "Server running. Check webhook.log for status."

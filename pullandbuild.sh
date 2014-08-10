@@ -19,6 +19,9 @@ function build() {
 	latexmk -pdf -silent -shell-escape "$1"
 }
 
+echo "Latex CD build start $(date)"
+
+# Load the ruby scripts in order to use the Dropbox upload
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 cd "$(dirname ${BASH_SOURCE[0]})"
 
