@@ -52,10 +52,15 @@ db_token=$(cat dbtoken)
 
 IFS=$'\n'
 
+dir_num=0
+dir_upd=0
+dir_err=0
+
 for texfile in $(ls $repo_dir/*/*.tex); do
 	cwd=$(pwd)
 	cd "$(dirname $texfile)"
-	
+	(( dir_num += 1))	
+
 	echo "Checking $texfile..."
 	texfile="$(basename $texfile)"
 
@@ -68,9 +73,11 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 	if ! latexmk -pdf -r "$cwd/uptodatecheck.latexmkrc" "$texfile" &>/dev/null ; then
 		echo "$texfile out of date. Compiling..."
 		if build "$texfile" ; then
+			(( dir_upd += 1))
 			echo "Uploading $texfile..."
 			$ruby_bin "$cwd/dbupload.rb" "$db_token" "${texfile/.tex/.pdf}"
 		else
+			(( dir_err += 1))
 			echo "Compilation failed for $texfile"
 			failed="$failed $texfile"
 		fi
@@ -80,5 +87,6 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 	echo
 done
 
+echo "Found $dir_num courses, updated $dir_upd, failed $dir_err."
 [[ -z "$failed" ]] || echo "Compilation failed for $failed "
 echo "done: $(date)"
