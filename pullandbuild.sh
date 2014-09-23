@@ -47,6 +47,10 @@ if echo $changes | grep "$packages_dir" &> /dev/null; then
 	cd "$cwd"
 fi
 
+if [ "$1" = "--force" ]; then
+	packages_changed=true
+fi
+
 cd ..
 
 db_token=$(cat dbtoken)
