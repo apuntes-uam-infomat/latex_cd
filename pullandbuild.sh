@@ -5,6 +5,7 @@ packages_changed=false
 repo_dir="repo"
 ruby_bin="/home/gjulianm/.rvm/rubies/ruby-2.0.0-p451/bin/ruby"
 failed=""
+updated=""
 
 function packages_install() {
 	cd "$packages_dir"
@@ -74,6 +75,7 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 		echo "$texfile out of date. Compiling..."
 		if build "$texfile" ; then
 			(( dir_upd += 1))
+			updated="$updated $texfile"
 			echo "Uploading $texfile..."
 			$ruby_bin "$cwd/dbupload.rb" "$db_token" "${texfile/.tex/.pdf}"
 		else
@@ -89,4 +91,5 @@ done
 
 echo "Found $dir_num courses, updated $dir_upd, failed $dir_err."
 [[ -z "$failed" ]] || echo "Compilation failed for $failed "
+[[ -z "$updated" ]] || echo "Updated $updated"
 echo "done: $(date)"
