@@ -17,7 +17,7 @@ function prebuild() {
 }
 
 function build() {
-	latexmk -pdf -silent -shell-escape "$1"
+	latexmk -pdf -silent -shell-escape "$1" &> /dev/null
 }
 
 echo "Latex CD build start $(date)"
@@ -78,6 +78,7 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 	if ! latexmk -pdf -r "$cwd/uptodatecheck.latexmkrc" "$texfile" &>/dev/null ; then
 		echo "$texfile out of date. Compiling..."
 		if build "$texfile" ; then
+			echo "$texfile compile successful."
 			(( dir_upd += 1))
 			updated="$updated $texfile"
 			echo "Uploading $texfile..."
