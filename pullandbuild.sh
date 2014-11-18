@@ -20,6 +20,41 @@ function build() {
 	latexmk -pdf -silent -shell-escape "$1" &> /dev/null
 }
 
+function report_build_failed() {
+	texfile="$1"
+	[ ! -z "$texfile" ] || return 0
+
+	git checkout master@{1}
+	
+	target_dir=$(basename "$(pwd)")
+
+	if ! latexmk -pdf -silent -shell-escape "$texfile" &> /dev/null; then
+		echo "Error present before this pull."
+		git checkout master
+		return
+	fi
+
+	cd ..
+	git checkout master
+	git bisect start master master@{1}
+	git bisect run latexmk -pdf -silent -shell-escape "$target_dir/$texfile"
+	bad_commit=$(git rev-parse HEAD)
+	author=$(git --no-pager show -s --format='%an <%ae>' HEAD)
+	git bisect reset
+	cd $target_dir
+	
+
+	commit_api_url="https://api.github.com/repos/VicdeJuan/Apuntes/commits/$bad_commit"
+	author_ghname="$(curl $commit_api_url | grep login | awk '{print $2}' | tr -d '"' | tr -d ',' | head -n 1)"
+
+	msg_title="Fallo de compilación en $texfile"
+	msg_contents="Error introducido en commit $bad_commit por @$author_ghname."
+	
+	ghi open -m "$(echo -e "$msg_title\n $msg_contents")"
+	echo $msg_contents
+}
+
+
 echo "Latex CD build start $(date)"
 
 # Load the ruby scripts in order to use the Dropbox upload
@@ -85,6 +120,7 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 			$ruby_bin "$cwd/dbupload.rb" "$db_token" "${texfile/.tex/.pdf}"
 		else
 			(( dir_err += 1))
+			report_build_failed "$texfile"
 			echo "Compilation failed for $texfile"
 			failed="$failed $texfile"
 		fi
