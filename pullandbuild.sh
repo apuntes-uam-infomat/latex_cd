@@ -25,7 +25,7 @@ function report_build_failed() {
 	[ ! -z "$texfile" ] || return 0
 
 	git checkout master@{1}
-	
+
 	target_dir=$(basename "$(pwd)")
 
 	if ! latexmk -pdf -silent -shell-escape "$texfile" &> /dev/null; then
@@ -37,20 +37,22 @@ function report_build_failed() {
 	cd ..
 	git checkout master
 	git bisect start master master@{1}
-	git bisect run latexmk -pdf -silent -shell-escape "$target_dir/$texfile"
+	git bisect run sh -c "cd \"$target_dir\"; latexmk -g -pdf -silent -shell-escape \"$texfile\""
 	bad_commit=$(git rev-parse HEAD)
 	author=$(git --no-pager show -s --format='%an <%ae>' HEAD)
+	cd "$target_dir"
+	logfile=$(echo "$texfile" | sed 's/.tex/.log/')
+	errors=$(cat "$logfile" | grep -A 4 !)
 	git bisect reset
 	cd $target_dir
-	
 
 	commit_api_url="https://api.github.com/repos/VicdeJuan/Apuntes/commits/$bad_commit"
 	author_ghname="$(curl $commit_api_url | grep login | awk '{print $2}' | tr -d '"' | tr -d ',' | head -n 1)"
 
 	msg_title="Fallo de compilación en $texfile"
 	msg_contents="Error introducido en commit $bad_commit por @$author_ghname."
-	
-	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents\n Mensaje creado automáticamente.")"
+
+	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents\n\n Errores:\n$errors \n Mensaje creado automáticamente.")"
 	echo $msg_contents
 }
 
@@ -99,12 +101,12 @@ dir_err=0
 for texfile in $(ls $repo_dir/*/*.tex); do
 	cwd=$(pwd)
 	cd "$(dirname $texfile)"
-	(( dir_num += 1))	
+	(( dir_num += 1))
 
 	echo "Checking $texfile..."
 	texfile="$(basename $texfile)"
 
-	if [ "$packages_changed" = true ]; then 
+	if [ "$packages_changed" = true ]; then
 		latexmk -C
 	fi
 
@@ -120,8 +122,8 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 			$ruby_bin "$cwd/dbupload.rb" "$db_token" "${texfile/.tex/.pdf}"
 		else
 			(( dir_err += 1))
-			report_build_failed "$texfile"
 			echo "Compilation failed for $texfile"
+			report_build_failed "$texfile"
 			failed="$failed $texfile"
 		fi
 	fi
