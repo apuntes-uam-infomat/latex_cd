@@ -50,7 +50,7 @@ function report_build_failed() {
 	msg_title="Fallo de compilación en $texfile"
 	msg_contents="Error introducido en commit $bad_commit por @$author_ghname."
 	
-	ghi open -m "$(echo -e "$msg_title\n $msg_contents\n Mensaje creado automáticamente.")"
+	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents\n Mensaje creado automáticamente.")"
 	echo $msg_contents
 }
 
