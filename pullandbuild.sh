@@ -24,6 +24,9 @@ function report_build_failed() {
 	texfile="$1"
 	[ ! -z "$texfile" ] || return 0
 
+	logfile=$(echo "$texfile" | sed 's/.tex/.log/')
+	errors=$(cat "$logfile" | grep -A 4 '!' | sed 's/\\/\\\\/g' | iconv -f latin1 -t ascii//TRANSLIT)
+
 	git checkout master@{1}
 
 	target_dir=$(basename "$(pwd)")
@@ -37,22 +40,22 @@ function report_build_failed() {
 	cd ..
 	git checkout master
 	git bisect start master master@{1}
-	git bisect run sh -c "cd \"$target_dir\"; latexmk -g -pdf -silent -shell-escape \"$texfile\""
+	git bisect run bash -c "cd \"$target_dir\"; latexmk -g -pdf -silent -shell-escape \"$texfile\""
 	bad_commit=$(git rev-parse HEAD)
 	author=$(git --no-pager show -s --format='%an <%ae>' HEAD)
-	cd "$target_dir"
-	logfile=$(echo "$texfile" | sed 's/.tex/.log/')
-	errors=$(cat "$logfile" | grep -A 4 !)
 	git bisect reset
-	cd $target_dir
+	cd "$target_dir"
+
+	latexmk -C
 
 	commit_api_url="https://api.github.com/repos/VicdeJuan/Apuntes/commits/$bad_commit"
 	author_ghname="$(curl $commit_api_url | grep login | awk '{print $2}' | tr -d '"' | tr -d ',' | head -n 1)"
 
 	msg_title="Fallo de compilación en $texfile"
 	msg_contents="Error introducido en commit $bad_commit por @$author_ghname."
+	errors_msg="Log de error: \n\n \`\`\`\n$errors \n \`\`\` \n"
 
-	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents\n\n Errores:\n$errors \n Mensaje creado automáticamente.")"
+	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
 	echo $msg_contents
 }
 
