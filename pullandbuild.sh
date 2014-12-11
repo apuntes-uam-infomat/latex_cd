@@ -20,6 +20,46 @@ function build() {
 	latexmk -pdf -silent -shell-escape "$1" &> /dev/null
 }
 
+function check_conflicts() {
+	dir=$(basename "$(pwd)")
+	texfile="$dir/$1"
+
+	cd ..
+
+	if ! grep "<<< HEAD" "$texfile" &> /dev/null ; then
+		return
+	fi
+
+	echo "Conflict markers present in $texfile."
+
+	git checkout master@{1}
+
+	if ! grep "<<< HEAD" "$texfile" &> /dev/null ; then
+		echo "Conflict master present before this pull"
+		git checkout master
+		cd "$dir"
+		return
+	fi
+
+	git bisect start master master@{1}
+	git bisect run grep "<<< HEAD" "$texfile"
+	bad_commit=$(git rev-parse HEAD)
+	author=$(git --no-pager show -s --format='%an <%ae>' HEAD)
+	markers=$(grep -n -C 3 "<<< HEAD" "$texfile" | sed 's/\\/\\\\/g' | iconv -f latin1 -t ascii//TRANSLIT)
+	git bisect reset
+	git checkout master
+
+	commit_api_url="https://api.github.com/repos/VicdeJuan/Apuntes/commits/$bad_commit"
+	author_ghname="$(curl $commit_api_url | grep login | awk '{print $2}' | tr -d '"' | tr -d ',' | head -n 1)"
+
+	msg_title="Marcadores de conflicto en $texfile"
+	msg_contents="Marcadores introducidos en commit $bad_commit por @$author_ghname."
+	errors_msg="Marcadores: \n\n \`\`\`\n$markers \n \`\`\` \n"
+
+	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
+	echo $msg_contents
+}
+
 function report_build_failed() {
 	texfile="$1"
 	[ ! -z "$texfile" ] || return 0
@@ -130,6 +170,8 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 			failed="$failed $texfile"
 		fi
 	fi
+
+	check_conflicts "$texfile"
 
 	cd "$cwd"
 	echo
