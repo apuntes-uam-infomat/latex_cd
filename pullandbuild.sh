@@ -86,6 +86,13 @@ function report_build_failed() {
 	git bisect reset
 	cd "$target_dir"
 
+	if ! latexmk -pdf -silent -shell-escape "$texfile" &> /dev/null; then
+		echo "Error not introduced in this commit. Possibly caused by a merge..."
+		git checkout master
+		return
+	fi
+
+
 	latexmk -C
 
 	commit_api_url="https://api.github.com/repos/VicdeJuan/Apuntes/commits/$bad_commit"
