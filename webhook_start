@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function cleanup () {
+	pkill -TERM -P $$
+}
+
+trap cleanup SIGINT
+
 cd $(dirname $SINATRA_PATH)
 source /etc/profile.d/rvm.sh
 rvm $RUBYVER do bundle exec ruby $SINATRA_PATH &> $LOGFILE </dev/null

@@ -37,7 +37,12 @@ start)
 ;;
 
 stop)
-	$DAEMON --stop $DAEMON_OPTS --retry 5
+	pid=$(cat $PID_FILE)
+	$DAEMON --stop $DAEMON_OPTS --retry=INT/5/TERM/2/KILL/1
+
+	if [ $? -ne 0 ]; then
+		pkill -P $pid
+	fi
 ;;
 
 status)
