@@ -19,8 +19,12 @@ chown $USER:$GROUP -R $PREFIX/.bundle Gemfile.lock
 sudo -i -u $USER bash -c "source /etc/profile.d/rvm.sh && rvm use $RUBYVER"
 sudo -i -u $USER bash -c "source /etc/profile.d/rvm.sh && cd $PREFIX/latex_cd && rvm $RUBYVER do bundle install --path=$PREFIX/.bundle"
 
-rm -rf repo
-git clone $REPO repo
+
+if [ "$1" != "update" ]; then
+	rm -rf repo
+	git clone $REPO repo
+fi
+
 chown $USER:$GROUP -R repo
 
 mkdir -p $LOGDIR
