@@ -13,7 +13,8 @@ cd $PREFIX/latex_cd
 
 mv latexcd.conf ..
 
-mkdir -p repo
+rm -rf repo
+git clone $REPO repo
 chown $USER:$GROUP -R repo
 
 mkdir -p $LOGDIR
