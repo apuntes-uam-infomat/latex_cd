@@ -56,7 +56,7 @@ function check_conflicts() {
 	msg_contents="Marcadores introducidos en commit $bad_commit por @$author_ghname."
 	errors_msg="Marcadores: \n\n \`\`\`\n$markers \n \`\`\` \n"
 
-	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
+	rvm $RUBYVER do /usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
 	echo $msg_contents
 }
 
@@ -102,7 +102,7 @@ function report_build_failed() {
 	msg_contents="Error introducido en commit $bad_commit por @$author_ghname."
 	errors_msg="Log de error: \n\n \`\`\`\n$errors \n \`\`\` \n"
 
-	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
+	rvm $RUBYVER do	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
 	echo $msg_contents
 }
 
