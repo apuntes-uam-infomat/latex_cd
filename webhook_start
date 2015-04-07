@@ -1,3 +1,5 @@
 #!/bin/bash
 
-ruby $SINATRA_PATH &> $LOGFILE </dev/null
+cd $(dirname $SINATRA_PATH)
+source /etc/profile.d/rvm.sh
+rvm $RUBYVER do bundle exec ruby $SINATRA_PATH &> $LOGFILE </dev/null

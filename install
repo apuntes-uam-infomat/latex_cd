@@ -7,11 +7,17 @@ cat latexcd | sed "s#PREFIX=.*#PREFIX=$PREFIX#" > /etc/init.d/latexcd
 chmod a+x /etc/init.d/latexcd
 
 mkdir -p $PREFIX
-rsync -avr --exclude ".git" --exclude "repo" "$(pwd)/" $PREFIX/latex_cd
+rsync -ar --exclude ".git" --exclude "repo" "$(pwd)/" $PREFIX/latex_cd
 
 cd $PREFIX/latex_cd
 
 mv latexcd.conf ..
+
+mkdir -p $PREFIX/.bundle
+touch Gemfile.lock
+chown $USER:$GROUP -R $PREFIX/.bundle Gemfile.lock
+sudo -i -u $USER bash -c "source /etc/profile.d/rvm.sh && rvm use $RUBYVER"
+sudo -i -u $USER bash -c "source /etc/profile.d/rvm.sh && cd $PREFIX/latex_cd && rvm $RUBYVER do bundle install --path=$PREFIX/.bundle"
 
 rm -rf repo
 git clone $REPO repo

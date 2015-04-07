@@ -109,8 +109,6 @@ function report_build_failed() {
 
 echo "Latex CD build start $(date)"
 
-# Load the ruby scripts in order to use the Dropbox upload
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 cd "$(dirname ${BASH_SOURCE[0]})"
 
 cd $repo_dir
@@ -169,7 +167,10 @@ for texfile in $(ls $repo_dir/*/*.tex); do
 			(( dir_upd += 1))
 			updated="$updated $texfile"
 			echo "Uploading $texfile..."
-			$ruby_bin "$cwd/dbupload.rb" "$db_token" "${texfile/.tex/.pdf}"
+			wd=$(pwd)
+			cd "$cwd"
+			rvm $RUBYVER do bundle exec ruby dbupload.rb "$db_token" "$wd/${texfile/.tex/.pdf}"
+			cd "$wd"
 		else
 			(( dir_err += 1))
 			echo "Compilation failed for $texfile"
