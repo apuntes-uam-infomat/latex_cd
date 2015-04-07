@@ -21,4 +21,5 @@ This is a small set of scripts to enable continuous compilation and deployment o
 6. Execute the install script with `sudo ./install`. It will install the application to your chosen prefix (see _latexcd.conf_ file) and install all necessary dependencies.
 7. Run the service with `sudo servie latexcd start`.
 8. Execute _latexcd_ at boot with `sudo update-rc.d latexcd defaults`.
+9. (Optional) Configure [GHI](https://github.com/stephencelis/ghi) in the repo (_/opt/latexcd/latex\_cd/repo_). Remember to prefix the executions with `rvm 2.2.1 do ghi ..." to avoid possible problems.
 
