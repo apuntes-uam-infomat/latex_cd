@@ -1,7 +1,3 @@
 #!/bin/bash
-nohup ruby /home/gjulianm/latex_cd/webhook.rb &> /var/log/webhook.log &
-if [ $? -eq 0 ]; then
-	echo "Server running. Check webhook.log for status."
-else
-	echo "Error starting webserver"
-fi
+
+ruby $SINATRA_PATH &> $LOGFILE </dev/null

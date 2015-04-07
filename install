@@ -1,0 +1,23 @@
+#!/bin/bash
+cd "$(dirname ${BASH_SOURCE[0]})"
+source latexcd.conf
+
+# Install as a system service, replacing the prefix
+cat latexcd | sed "s#PREFIX=.*#PREFIX=$PREFIX#" > /etc/init.d/latexcd
+chmod a+x /etc/init.d/latexcd
+
+mkdir -p $PREFIX
+rsync -avr --exclude ".git" --exclude "repo" "$(pwd)/" $PREFIX/latex_cd
+
+cd $PREFIX/latex_cd
+
+mv latexcd.conf ..
+
+mkdir -p repo
+chown $USER:$GROUP -R repo
+
+mkdir -p $LOGDIR
+chown $USER:$GROUP -R $LOGDIR
+
+echo "latexcd installed. Try: sudo service latexcd start"
+

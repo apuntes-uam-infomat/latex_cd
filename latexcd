@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+# Startup script for the latexcd Server
+#
+# chkconfig: – 50 50
+# description: latexcd is a continuous compilation service for LaTeX files
+# processname: latexcd
+# pidfile: /opt/latexcd/latexcd.pid
+# config:  /opt/latexcd/latexcd.conf
+# command: /opt/latexcd/latexcd/webhook_start
+PREFIX=/opt/latexcd
+CONFIG_FILE=$PREFIX/latexcd.conf
+PID_FILE=$PREFIX/latexcd.pid
+PULLANDBUILD_PATH=$PREFIX/latex_cd/pullandbuild.sh
+SINATRA_PATH=$PREFIX/latex_cd/webhook.rb
+CMD=$PREFIX/latex_cd/webhook_start
+
+set -a
+. $CONFIG_FILE
+set +a
+
+DAEMON="start-stop-daemon"
+DAEMON_OPTS="-o --pidfile $PID_FILE --user $USER"
+
+case "$1" in
+start)
+	# Starts the latexcd deamon
+	echo "Starting latexcd"
+	export PULLANDBUILD_PATH SINATRA_PATH
+	$DAEMON --start $DAEMON_OPTS --background -m -g $GROUP -c $USER --exec $CMD
+
+	if [ $? -eq 0 ]; then
+		echo "Server running. Check $LOGFILE for status."
+	else
+		echo "Error starting webserver"
+	fi
+;;
+
+stop)
+	$DAEMON --stop $DAEMON_OPTS --retry 5
+;;
+
+status)
+	if $DAEMON --status $DAEMON_OPTS ; then
+		echo "latexcd is running, PID $(cat $PID_FILE)"
+	else
+		echo "latexcd is not running"
+	fi
+;;
+
+restart)
+	## Stop the service regardless of whether it was
+	## running or not, start it again.
+	echo "Restarting latexcd"
+	$0 stop
+	$0 start
+;;
+
+*)
+	echo "Usage: latexcd (start|stop|restart|status)"
+	exit 1
+;;
+
+esac
+

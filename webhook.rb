@@ -2,10 +2,12 @@ require 'sinatra'
 require 'json'
 
 set :bind, '0.0.0.0'
+set :port, ENV["PORT"].to_i
+
+script_path = ENV["PULLANDBUILD_PATH"]
 
 post '/payload' do
-  puts "Payload received"
-  system '/home/gjulianm/latex_cd/pullandbuild.sh 2>&1 &'
+  system script_path + ' 2>&1 &'
 end
 
 get '/' do
