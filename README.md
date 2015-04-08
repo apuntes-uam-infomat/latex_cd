@@ -24,3 +24,6 @@ This is a small set of scripts to enable continuous compilation and deployment o
 8. Execute _latexcd_ at boot with `sudo update-rc.d latexcd defaults`.
 9. (Optional for issue reporting) Configure [GHI](https://github.com/stephencelis/ghi) in the repo (_/opt/latexcd/latex\_cd/repo_). Remember to prefix the executions with `rvm 2.2.1 do ghi ..." to avoid possible problems.
 
+# Collaboration
+
+Just send a pull request :)
