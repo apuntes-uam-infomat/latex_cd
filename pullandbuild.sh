@@ -6,6 +6,9 @@ repo_dir="repo"
 failed=""
 updated=""
 
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 function packages_install() {
 	cd "$packages_dir"
 	./install
