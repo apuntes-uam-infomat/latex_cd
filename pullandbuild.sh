@@ -3,7 +3,6 @@
 packages_dir="Cosas guays LaTeX"
 packages_changed=false
 repo_dir="repo"
-ruby_bin="/home/gjulianm/.rvm/rubies/ruby-2.0.0-p451/bin/ruby"
 failed=""
 updated=""
 
