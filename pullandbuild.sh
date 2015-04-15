@@ -6,6 +6,8 @@ repo_dir="repo"
 failed=""
 updated=""
 
+repo_path=$(git remote -v | grep fetch | awk '{print $2}' | head -n 1 | awk -F: '{print $2}' | sed 's/.git//')
+
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
@@ -20,6 +22,22 @@ function prebuild() {
 
 function build() {
 	latexmk -pdf -silent -shell-escape "$1" &> /dev/null
+}
+
+function report_commit() {
+	bad_commit="$1"
+	msg_contents="$2"
+
+	commit_api_url="https://api.github.com/repos/$repo_path/commits/$bad_commit"
+
+	echo "Retrieving author... $(commit_api_url)"
+
+	author_ghname="$(curl $commit_api_url | grep login | awk '{print $2}' | tr -d '"' | tr -d ',' | head -n 1)"
+
+	msg_contents="$(echo -e $msg_contents | sed "s/AUTHOR/$author_ghname/g" | sed "s/COMMIT/$bad_commit/g")"
+
+	rvm $RUBYVER do /usr/local/bin/ghi open -m "$(echo -e "$msg_contents")"
+	echo $msg_contents
 }
 
 function check_conflicts() {
@@ -51,15 +69,11 @@ function check_conflicts() {
 	git bisect reset
 	git checkout master
 
-	commit_api_url="https://api.github.com/repos/VicdeJuan/Apuntes/commits/$bad_commit"
-	author_ghname="$(curl $commit_api_url | grep login | awk '{print $2}' | tr -d '"' | tr -d ',' | head -n 1)"
-
 	msg_title="Marcadores de conflicto en $texfile"
-	msg_contents="Marcadores introducidos en commit $bad_commit por @$author_ghname."
+	msg_contents="Marcadores introducidos en commit COMMIT por @AUTHOR"
 	errors_msg="Marcadores: \n\n \`\`\`\n$markers \n \`\`\` \n"
 
-	rvm $RUBYVER do /usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
-	echo $msg_contents
+	report_commit $bad_commit "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
 }
 
 function report_build_failed() {
@@ -97,15 +111,15 @@ function report_build_failed() {
 
 	latexmk -C
 
-	commit_api_url="https://api.github.com/repos/VicdeJuan/Apuntes/commits/$bad_commit"
+	commit_api_url="https://api.github.com/repos/$repo_path/commits/$bad_commit"
+	echo "Retrieving author name... ($commit_api_url)"
 	author_ghname="$(curl $commit_api_url | grep login | awk '{print $2}' | tr -d '"' | tr -d ',' | head -n 1)"
 
 	msg_title="Fallo de compilación en $texfile"
 	msg_contents="Error introducido en commit $bad_commit por @$author_ghname."
 	errors_msg="Log de error: \n\n \`\`\`\n$errors \n \`\`\` \n"
 
-	rvm $RUBYVER do	/usr/local/bin/ghi open -m "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
-	echo $msg_contents
+	report_commit $bad_commit "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
 }
 
 
