@@ -134,8 +134,7 @@ if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
 	git stash save "auto stash $(date)"
 fi
 
-echo "Push to remote repo at $(date)"
-echo "Pulling repository"
+echo "Pull from remote repo at $(date)"
 git pull
 
 changes=$(git diff --name-only master@{1})
