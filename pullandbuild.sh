@@ -75,7 +75,7 @@ function check_conflicts() {
 	msg_contents="Marcadores introducidos en commit COMMIT por @AUTHOR"
 	errors_msg="Marcadores: \n\n \`\`\`\n$markers \n \`\`\` \n"
 
-	report_commit $bad_commit "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
+	report_commit $bad_commit "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente."
 }
 
 function report_build_failed() {
@@ -121,7 +121,7 @@ function report_build_failed() {
 	msg_contents="Error introducido en commit $bad_commit por @$author_ghname."
 	errors_msg="Log de error: \n\n \`\`\`\n$errors \n \`\`\` \n"
 
-	report_commit $bad_commit "$(echo -e "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente.")"
+	report_commit $bad_commit "$msg_title\n $msg_contents \n\n $errors_msg \n Mensaje creado automáticamente."
 }
 
 
