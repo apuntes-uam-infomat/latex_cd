@@ -6,6 +6,7 @@ repo_dir="repo"
 failed=""
 updated=""
 
+cd $repo_dir
 repo_path=$(git remote -v | grep fetch | awk '{print $2}' | head -n 1 | awk -F: '{print $2}' | sed 's/.git//')
 
 export LANG=en_US.UTF-8
@@ -127,8 +128,6 @@ function report_build_failed() {
 echo "Latex CD build start $(date)"
 
 cd "$(dirname ${BASH_SOURCE[0]})"
-
-cd $repo_dir
 
 if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
 	echo "Dirty repo. stashing changes."
