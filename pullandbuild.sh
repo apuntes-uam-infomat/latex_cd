@@ -8,7 +8,7 @@ updated=""
 
 cd "$(dirname ${BASH_SOURCE[0]})"
 cd $repo_dir
-repo_path=$(git remote -v | grep fetch | awk '{print $2}' | head -n 1 | awk -F: '{print $2}' | sed 's/.git//')
+repo_path=$(git remote -v | grep fetch | awk '{print $2}' | head -n 1 | sed 's#.*[:/]\(.*\)/\(.*\).git#\1/\2#g')
 
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
